@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Trading Results</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            background: url('https://www.purelyschool.com/wp-content/uploads/2023/05/%E7%B5%9C%E8%8C%B5-04.%E8%82%A1%E7%A5%A8%E5%85%A5%E9%96%80-%E9%A6%96%E5%9C%96.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(130, 169, 220, 0.5); /* 黑色透明遮罩，50%透明度 */
+            z-index: 1;
+        }
+
+        .container {
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        h1 {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        form {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        #stock-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        #stock-group .form-group {
+            flex: 1 1 30%;
+            display: flex;
+            align-items: center;
+        }
+
+        #stock-group .form-group label {
+            width: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-right: 10px;
+            color: #34495e;
+        }
+
+        #stock-group .form-group select,
+        #stock-group .form-group input {
+            flex: 1;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        form button {
+            width: 100%;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: #fff;
+            padding: 12px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            margin-top: 20px; 
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        form button:hover {
+            background: linear-gradient(to right, #2980b9, #1c5980);
+            transform: translateY(-2px);
+        }
+
+        #result {
+            width: 97%;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: visible;
+        }
+
+        #result h1 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        #result img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20;
+        }
+
+        #result p {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        #profit {
+            color: #34495e;
+            font-size:22px;
+            font-weight: bold;
+            visibility: hidden;
+        }
+
+        #profitAmount {
+            color: #f39c9c;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        #errorMessage {
+            color: #e74c3c!important;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        #modal h2 {
+            margin: 0 0 10px;
+            color: #2c3e50;
+        }
+
+        #modal p {
+            font-size: 20px;
+            margin: 0;
+            color: #34495e;
+        }
+
+        #modal .close {
+            float: right;       
+            margin-top: 20px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #modal .close:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Select the Stock
+            <img src="https://t3.ftcdn.net/jpg/01/08/24/94/360_F_108249487_w8UD8P6YOYuh6Pr9NUw08juskfxpIBk4.jpg" 
+                 alt="info" 
+                 id="infoIcon"
+                 style="width: 30px; height: 30px; cursor: pointer;" />
+        </h1>
+        <form id="stockForm">
+            <div id="stock-group">
+                <div class="form-group">
+                    <label for="stock_symbol">Stock Symbol:</label>
+                    <select id="stock_symbol" name="stock_symbol" required>
+                        <option value="2330">2330 台積電</option>
+                        <option value="2454">2454 聯發科</option>
+                        <option value="3443">3443 創意電子</option>
+                        <option value="3034">3034 聯詠</option>
+                        <option value="2379">2379 瑞昱</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" id="start_date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date:</label>
+                    <input type="date" id="end_date" name="end_date" required>
+                </div>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="result">
+            <h1>Result</h1>
+            <img id="resultImage" style="display:none;" />
+            <p id="profit">Total Profits: <span id="profitAmount"></span> dollars</p>
+            <p id="errorMessage"></p>
+        </div>
+
+        <div id="modal">
+            <h3>About This Page</h3>
+            <p>This page lets you select a stock, choose a date range, and analyze trading results.<br>
+                <br><b>Profit Calculation</b><br><br>
+                Total profit is calculated after deducting transaction costs, assuming <b>100</b> shares are bought on buy signals and sold entirely on sell signals.<br>
+                <br><span style="color: red;">Note</span>: Model predictions may have errors. Invest wisely and plan carefully.
+            </p>
+            <button class="close">Close</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#infoIcon').on('click', function () {
+                $('#modal').fadeIn();
+            });
+
+            $('#modal .close').on('click', function () {
+                $('#modal').fadeOut();
+            });
+
+            $('#stockForm').on('submit', function (event) {
+                event.preventDefault();
+
+                const startDate = new Date($('#start_date').val());
+                const endDate = new Date($('#end_date').val());
+                const differenceInTime = endDate - startDate;
+                const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+                if (differenceInDays < 180) {
+                    $('#errorMessage').text('Start and end dates must be at least 6 months apart.');
+                    return;
+                }
+
+                $('#resultImage').hide();
+                $('#profitAmount').text('');
+                $('#errorMessage').text('');
+
+                $.ajax({
+                    url: '/get_stock_data',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            $('#resultImage').attr('src', 'data:image/png;base64,' + response.image).show();
+                            $('#profitAmount').text(response.profit.toFixed(0));
+                            $('#profit').css('visibility', 'visible'); // 顯示 Total Profits 數字
+                        } else {
+                            $('#errorMessage').text(response.message);
+                        }
+                    },
+                    error: function () {
+                        $('#errorMessage').text('Please try later.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
