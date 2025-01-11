@@ -132,8 +132,8 @@
             object-fit: contain;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            margin-bottom: 20;
+            margin-top: 10px;
+            margin-bottom: 30px;
         }
 
         #result p {
@@ -199,6 +199,24 @@
         #modal .close:hover {
             background: #c0392b;
         }
+        
+        #loadingBox {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
     </style>
 </head>
 <body>
@@ -210,6 +228,9 @@
                  id="infoIcon"
                  style="width: 30px; height: 30px; cursor: pointer;" />
         </h1>
+
+        <div id="loadingBox">Processing...</div>
+
         <form id="stockForm">
             <div id="stock-group">
                 <div class="form-group">
@@ -264,6 +285,7 @@
 
             $('#stockForm').on('submit', function (event) {
                 event.preventDefault();
+                $('#loadingBox').fadeIn();
 
                 const startDate = new Date($('#start_date').val());
                 const endDate = new Date($('#end_date').val());
@@ -271,18 +293,22 @@
                 const differenceInDays = differenceInTime / (1000 * 3600 * 24);
                 if (differenceInDays < 180) {
                     $('#errorMessage').text('Start and end dates must be at least 6 months apart.');
+                    $('#loadingBox').fadeOut(); 
                     return;
                 }
 
                 $('#resultImage').hide();
                 $('#profitAmount').text('');
                 $('#errorMessage').text('');
-
+                $('#profit').css('visibility', 'hidden'); 
+                
                 $.ajax({
                     url: '/get_stock_data',
                     type: 'POST',
                     data: $(this).serialize(),
+                    
                     success: function (response) {
+
                         if (response.status === 'success') {
                             $('#resultImage').attr('src', 'data:image/png;base64,' + response.image).show();
                             $('#profitAmount').text(response.profit.toFixed(0));
@@ -292,7 +318,11 @@
                         }
                     },
                     error: function () {
+                        $('#loadingMessage').hide();
                         $('#errorMessage').text('Please try later.');
+                    },
+                    complete: function () {
+                        $('#loadingBox').fadeOut(); 
                     }
                 });
             });
