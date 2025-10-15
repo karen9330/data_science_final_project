@@ -11,6 +11,13 @@
 
   最後，本次專案是基於 Flask 來建構簡單的網站，使用者可透過介面選擇股票代碼、日期範圍，根據所選日期範圍，會對該時間段進行 PLR 後，再去提取特徵，並將特徵輸入給預先訓練好的模型，最終會在畫面上看到總獲利及交易視覺化的結果 。
 
-#### 使用方式
+  詳細實作細節參考：[書面報告](https://docs.google.com/document/d/16-PdCLmngZLTd-cWhuX6NJlFlSMdQ3dI_sQhNYeVm1M/edit?tab=t.ntc8jyhw8gsv) 
+### 檔案說明
+1. models：每檔股票的訓練模型
+2. templates：網頁的 html
+3. app.ipynb：抓股票資料、資料前處理、使用 models 的模型產生結果
+4. final_project.ipynb：模型訓練
+   
+### 使用方式
 
 下載檔案後，開啟 app.ipynb 後執行所有的 cell 後，並點擊連結即可體驗。
